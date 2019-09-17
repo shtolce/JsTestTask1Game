@@ -1,0 +1,10 @@
+.mainContent__canvZ1{
+    position:absolute;
+    z-index: 1;
+}
+.mainContent__canvZ2{
+    position:absolute;
+    z-index: 2;
+}
+.mainContent{
+}

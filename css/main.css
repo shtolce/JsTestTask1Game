@@ -4,7 +4,12 @@
 }
 .mainContent__canvZ2{
     position:absolute;
+    z-index: 3;
+}
+.mainContent__canvZ3{
+    position:absolute;
     z-index: 2;
 }
+
 .mainContent{
 }

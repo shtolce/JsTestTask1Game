@@ -8,6 +8,12 @@ mainCanvasZ2.width = window.innerWidth;
 mainCanvasZ2.height = window.innerHeight;
 var mainContextZ2 = mainCanvasZ2.getContext("2d");
 
+var mainCanvasZ3 = document.getElementById("mainCanvasZ3");
+mainCanvasZ3.width = window.innerWidth;
+mainCanvasZ3.height = window.innerHeight;
+var mainContextZ3 = mainCanvasZ3.getContext("2d");
+
+
 function bgImageObject(src){
     this._src = src;
     this._bg;
@@ -103,6 +109,8 @@ function gameManagerObject(){
     this._noBtn;
     this._yesBtnp;
     this._noBtnp;
+    this._isTimeOut;
+
     let x1YesBtn = -btnImageSize.x/2+mainCanvasZ2.width/2-150;
     let y1YesBtn = +mainCanvasZ2.height-100;
     let x2YesBtn = -btnImageSize.x/2+mainCanvasZ2.width/2-150+btnImageSize.x;
@@ -116,6 +124,8 @@ function gameManagerObject(){
         return new Promise((res)=>{
             this._playerTitle = "Коля";
             this._taskTitle = "Задание 1";
+            this._taskTimer = 60;
+            this._taskTimerTitle = this._taskTimer +' сек';
             this._isLoaded = false;
             this._score = new Image(scoreImageSize.x,scoreImageSize.y);
             this._yesBtn = new Image(btnImageSize.x,btnImageSize.y);
@@ -127,7 +137,7 @@ function gameManagerObject(){
             this._progressFilled = 0;
             this._progressFilledTitle = `${this._progressFilled} из 11`;
             this._scoreTitle = 50;
-            this._pbArr = ['pb-1.png','pb-2.png','pb-3.png','pb-4.png','pb-5.png','pb-6.png','pb-7.png','pb-8.png','pb-9.png','pb-10.png'];
+            this._pbArr = ['pb-1.png','pb-2.png','pb-3.png','pb-4.png','pb-5.png','pb-6.png','pb-7.png','pb-8.png','pb-9.png','pb-10.png','pb-11.png'];
             let loaded = function(){
                 this._score.src = "./images/elements/score.png";
                 this._score.onload = ()=>{
@@ -143,7 +153,7 @@ function gameManagerObject(){
                 let img = new Image(progressImageSize.x,progressImageSize.y);
                 img.src = './images/elements/'+el;
                 this._progress.push(img);
-                if (el=='pb-10.png')
+                if (el=='pb-11.png')
                     img.onload = loaded.apply(this);
             });
             this.start=true;
@@ -158,7 +168,10 @@ function gameManagerObject(){
         ctxZ1.fillText(this._taskTitle, mainCanvasZ1.width/2-100, 50);
         ctxZ1.drawImage(this._progress[this._progressFilled],x-progressImageSize.x+mainCanvasZ1.width-40,y+10,progressImageSize.x,progressImageSize.y);
         ctxZ1.drawImage(this._score,x+150,y,scoreImageSize.x,scoreImageSize.y);
-        ctxZ2.clearRect(0,0,mainCanvasZ2.width,progressImageSize.y+100);
+        ctxZ2.clearRect(0,0,mainCanvasZ2.width,progressImageSize.y+90);
+        ctxZ2.fillStyle = "darkviolet";
+        ctxZ2.font = "bold 30px Comic Sans MS";
+        ctxZ2.fillText(this._taskTimerTitle, mainCanvasZ1.width/2-100, 90);
         ctxZ2.fillStyle = "brown";
         ctxZ2.font = "bold 30px Comic Sans MS";
         ctxZ2.fillText(this._scoreTitle.toString(), scoreImageSize.x/2+150, 55);
@@ -173,6 +186,22 @@ function gameManagerObject(){
 
 
     }
+    this._startTimer = function(){
+        this._isTimeOut = false;
+
+        let si = setInterval(()=>{
+            this._taskTimer --;
+            if (this._taskTimer==0) {
+                this._isTimeOut = true;
+                clearInterval(si);
+            }
+
+        },1000);
+
+
+
+    }
+
 
     this.drawOnce = function (x,y,ctxZ1,ctxZ2) {
         this._btnYesPressed = false;
@@ -181,7 +210,7 @@ function gameManagerObject(){
         this.goblinObject.loadImages().then((s)=>{
             this.goblinObject.drawCalmStateGoblin(x+mainCanvasZ2.width-this.goblinObject.width,y+mainCanvasZ2.height-this.goblinObject.height,ctxZ1,ctxZ2);
             //this.goblinObject.animHappyStateGoblin(x+mainCanvasZ2.width-this.goblinObject.width,y+mainCanvasZ2.height-this.goblinObject.height,ctxZ1,ctxZ2);
-            this.goblinObject.animAngryStateGoblin(x+mainCanvasZ2.width-this.goblinObject.width,y+mainCanvasZ2.height-this.goblinObject.height,ctxZ1,ctxZ2);
+//            this.goblinObject.animAngryStateGoblin(x+mainCanvasZ2.width-this.goblinObject.width,y+mainCanvasZ2.height-this.goblinObject.height,ctxZ1,ctxZ2);
         });
         this.start=false;
 
@@ -211,6 +240,9 @@ function gameManagerObject(){
     }
 
     this.draw = function(x,y){
+        this._progressFilledTitle = `${this._progressFilled} из 11`;
+        this._taskTimerTitle = this._taskTimer +' сек';
+
         let ctxZ1 =mainContextZ1;
         let ctxZ2 =mainContextZ2;
         this.drawInfo(x,y,ctxZ1,ctxZ2);
@@ -229,7 +261,52 @@ function gameManagerObject(){
 
 
 function gameProcessObject(){
+    this._artArrayNat = ['image1-1.jpg','image1-2.jpg','image1-3.jpg','image1-4.jpg','image1-5.jpg','image1-6.jpg'];
+    this._artArrayNoNat = ['image2-1.jpg','image2-2.jpg','image2-3.jpg','image2-4.jpg','image2-5.jpg'];
+    this._artArrayObj = [];
+    this._frameImg;
+    const sizeX = 640;
+    const sizeY = 480;
+    const sizeXCanv = 200;
+    const sizeYCanv = 200;
 
+    this.gameProcessInit = function() {
+        return new Promise(res => {
+            this._frameImg = new Image(sizeX,sizeY);
+            this._frameImg.src = './images/arts/frame-puzzle.png';
+
+            this._artArrayNat.forEach((el)=>{
+                let img =new Image(sizeX,sizeY);
+                img.src='./images/arts/'+el;
+                let imgObj = {
+                    image:img,
+                    type:'NoNat'
+                };
+                this._artArrayObj.push(imgObj);
+            });
+            this._artArrayNoNat.forEach((el)=>{
+                let img =new Image(sizeX,sizeY);
+                img.src='./images/arts/'+el;
+                let imgObj = {
+                    image:img,
+                    type:'Nat'
+                };
+                if (el=='image2-5.jpg')
+                    img.onload = ()=>{res();};
+                this._artArrayObj.push(imgObj);
+            });
+        });
+    };
+    this.getRandImage = function(){
+        let idx = Math.floor(Math.random()*(this._artArrayObj.length));
+        return this._artArrayObj[idx];
+    };
+    this.drawArtPicture = function(x,y,img) {
+        let ctxZ3 = mainContextZ3;
+        ctxZ3.clearRect(x-50,y-50,sizeXCanv+100,sizeYCanv+50);
+        ctxZ3.drawImage(img,x,y,sizeXCanv,sizeYCanv);
+        ctxZ3.drawImage(this._frameImg,x-15,y-25,sizeXCanv+32,sizeYCanv+50);
+    };
 
 }
 
@@ -240,24 +317,86 @@ function main(){
         e.draw(0,0);
     });
     gProc = new gameProcessObject();
+    gProc.gameProcessInit().then(()=>{
+    });
 
     let gMgrImageOb = new gameManagerObject();
     gMgrImageOb.createImage().then((e)=>{
+        gMgrImageOb._startTimer();
         e.draw(0,0);
         gameLoop(gMgrImageOb);
 
     });
 }
 main();
-
+let startTurn = true;
+let y=0;
+let x=0;
+let step =1;
+let img,type;
+let ctxZ1 = mainContextZ1;
+let ctxZ2 = mainContextZ2;
 function gameLoop(gMgrImageOb) {
+    if (startTurn){
+        let temp = gProc.getRandImage();
+        img = temp.image;
+        type = temp.type;
+        x = 200+(Math.random()*(mainCanvasZ3.width-500));
+        startTurn=false;
+        step =1;
+    }
     gMgrImageOb.draw(0,0);
+    gProc.drawArtPicture(x,y,img);
+    y+=step;
+    if (y>mainCanvasZ3.height+100){
+        y=0;
+        startTurn=true;
+
+    }
+    if (gMgrImageOb._btnYesPressed){
+        if (type == 'Nat'){
+            gMgrImageOb.goblinObject.animAngryStateGoblin(mainCanvasZ2.width-gMgrImageOb.goblinObject.width,
+                mainCanvasZ2.height-gMgrImageOb.goblinObject.height,ctxZ1,ctxZ2);
+            gMgrImageOb._progressFilled++;
+            gMgrImageOb._btnYesPressed=false;
+        }else
+            gMgrImageOb.goblinObject.animHappyStateGoblin(mainCanvasZ2.width-gMgrImageOb.goblinObject.width,
+                mainCanvasZ2.height-gMgrImageOb.goblinObject.height,ctxZ1,ctxZ2);
+        step=20;
+    }
+
+    if (gMgrImageOb._btnNoPressed) {
+
+        if (type == 'NoNat'){
+            gMgrImageOb.goblinObject.animAngryStateGoblin(mainCanvasZ2.width-gMgrImageOb.goblinObject.width,
+                mainCanvasZ2.height-gMgrImageOb.goblinObject.height,ctxZ1,ctxZ2);
+            gMgrImageOb._progressFilled++;
+            gMgrImageOb._btnNoPressed=false;
+        }else
+            gMgrImageOb.goblinObject.animHappyStateGoblin(mainCanvasZ2.width-gMgrImageOb.goblinObject.width,
+                mainCanvasZ2.height-gMgrImageOb.goblinObject.height,ctxZ1,ctxZ2);
+        step=20;
+    }
+
+
+
+    if (gMgrImageOb._progressFilled==11) {
+        sessionStorage['result'] = 'win';
+        gMgrImageOb._progressFilled=0;goToScorePage();
+    }
+    if (gMgrImageOb._isTimeOut == true) {
+        sessionStorage['result'] = 'loose';
+        gMgrImageOb._progressFilled=0;goToScorePage()
+    }
 
     requestAnimationFrame(gameLoop.bind(this,gMgrImageOb));
 
 }
 
-
+function goToScorePage()
+{
+    document.location.href = './score.html';
+}
 
 
 

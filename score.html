@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат испытания</title>
+    <link rel="stylesheet" href="./css/main.css">
+
+</head>
+<body>
+<canvas class="mainContent__canvZ1 w-100 h-100" id="mainCanvasZ1">
+</canvas>
+
+</body>
+
+<script>
+    var mainCanvasZ1 = document.getElementById("mainCanvasZ1");
+    let width = 250;
+    let height = 250;
+    let sizeX = 2085;
+    let sizeY = 2084;
+
+    mainCanvasZ1.width = window.innerWidth;
+    mainCanvasZ1.height = window.innerHeight;
+    var mainContextZ1 = mainCanvasZ1.getContext("2d");
+    let imgNextBtn =new Image(this.sizeX,this.sizeY);
+    imgNextBtn.src = './images/elements/next.gif';
+
+
+
+    let imgGoblinBg =new Image(this.sizeX,this.sizeY);
+    imgGoblinBg.src = "./images/bg/bg-2.jpg";
+    imgGoblinBg.onload =onLoad;
+    let imgGoblin =new Image(this.sizeX,this.sizeY);
+    let text ='';
+    imgGoblin.src='./images/elements/goblin/04.png';
+    if (sessionStorage['result'] == 'win'){
+        text = ['Ты справился с заданием гоблина, и ему ничего не остается,',
+                'как пропустить тебя к следующим испытаниям. «Но не радуйся слишком рано,',
+                '- злобно шипит Гоблин тебя в след, - мы с тобой ещё встретимся,',
+                'и тогда посмотрим, кто кого!`'];
+
+    }
+    if (sessionStorage['result'] == 'loose'){
+        text = ['Увы, ты не справился с заданием гоблина.',
+                'Но внезапно в его холодное, злобное сердце закралась доброта:',
+                'Гоблин соглашается пропустить тебя. «Но смотри, - ворчит он,',
+                '- не разочаруй меня: со следующими заданиями ты должен совладать гораздо лучше.»'];
+
+    }
+
+function onLoad(){
+    mainContextZ1.drawImage(imgGoblinBg,0,0,mainCanvasZ1.width,mainCanvasZ1.height);
+    mainContextZ1.drawImage(imgNextBtn,mainCanvasZ1.width/8,mainCanvasZ1.height/8,width,height/2);
+    mainContextZ1.drawImage(imgGoblin,mainCanvasZ1.width/8,mainCanvasZ1.height/2,width,height);
+
+    mainContextZ1.fillStyle = "Brown";
+    mainContextZ1.font = "bold 20px Comic Sans MS";
+    mainContextZ1.fillText(text[0],mainCanvasZ1.width/8+200,mainCanvasZ1.height/2+50);
+    mainContextZ1.fillText(text[1],mainCanvasZ1.width/8+200,mainCanvasZ1.height/2+70);
+    mainContextZ1.fillText(text[2],mainCanvasZ1.width/8+200,mainCanvasZ1.height/2+90);
+    mainContextZ1.fillText(text[3],mainCanvasZ1.width/8+200,mainCanvasZ1.height/2+110);
+
+
+}
+
+
+
+    //alert(sessionStorage['result']);
+
+</script>
+
+</html>
